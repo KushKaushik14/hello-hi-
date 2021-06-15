@@ -1,39 +1,38 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
+# Docs for the Azure Web Apps Deploy action: https://go.microsoft.com/fwlink/?linkid=2134798
+# More GitHub Actions for Azure: https://go.microsoft.com/fwlink/?linkid=2135048
 
-name: Build and deploy Python app to Azure Web App - healthsupport
+name: Azure App Service - Healthsupport(Production), Build and deploy Python app
 
 on:
   push:
     branches:
       - master
-  workflow_dispatch:
 
 jobs:
   build-and-deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    # checkout the repo
+    - name: 'Checkout Github Action'
+      uses: actions/checkout@master
+
 
     - name: Set up Python version
       uses: actions/setup-python@v1
       with:
-        python-version: '3.6'
+        python-version: '3.8'
 
-    - name: Install Python dependencies
-      run: |
-        python -m venv env
-        .\env\Scripts\activate
-        pip install -r requirements.txt
+    - name: Build using AppService-Build
+      uses: azure/appservice-build@v2
+      with:
+        platform: python
+        platform-version: '3.8'
 
-    - name: Zip the application files
-      run: Compress-Archive .\* app.zip
-
-    - name: 'Deploy to Azure Web App'
+    - name: Run Azure webapp deploy action using publish profile credentials
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'healthsupport'
-        slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_1e0461f34b9a416eb95c7d152ac4d74c }}
-        package: '.\app.zip'
+        app-name: Healthsupport
+        slot-name: Production
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3B06E6575C4C422690AD04C7A9214524 }}
+
